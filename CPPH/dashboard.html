@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doughnut Chart Example</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <script src="app.js"></script>
+</head>
+
+<header >
+    <picture>
+           <img class="logo" src="logo.jpg" alt="Calcomp Logo">
+           <img class="name" src="name.jpg" alt="Calcomp Name">
+       </picture>
+           <!-- <button onclick="myFunction()"><span class="line-md--align-justify"></span> </button></div> -->
+   </header>
+
+<body>
+    <main class="divider">
+        <nav id="sidebar" class="sidebar">
+            <!-- dashboard -->
+            <ul>
+                <li onclick="dashboardDropdown()">
+                    <span class="line-md--text-box1"></span>
+                    <h3>Dashboard </h3>
+                    <span id="arrow" class="line-md--arrow-left"></span> 
+                </li>
+                <ul id="dashboardDropdown">
+                  <li><a href="dashboardDailyTransfer.html">Daily Transfer</a></li>
+                  <li><a href="dashboardOutput.html">Output Monitoring</a></li>
+                  <li><a href="dashboardStatus.html">Overall Status</a></li>
+                  <li><a href="dashboardPrinting.html">Printing</a></li>
+                  <li><a href="dashboardAttendance.html">Attendance</a></li>
+                </ul>
+            </ul>
+            <!-- daily transfer -->
+            <ul>
+                <a href="dailyTransfer.html"><li> 
+                    <span class="line-md--arrows-horizontal1"></span>
+                    <h3>Daily Transfer </h3>
+                    <span id="arrow" class="line-md--arrow-left"></span> 
+                </li>
+               </a>
+            </ul>
+             <!-- Tooling -->
+             <ul>
+                <li onclick="toolingDropdown()"> 
+                    <span class="line-md--cog-loop1"></span>
+                    <h3>Tooling </h3>
+                    <span id="arrow" class="line-md--arrow-left"></span> 
+                </li>
+                <ul id="toolingDropdown">
+                  <li><a href="registration.html">Registration List</a></li>
+                  <li><a href="toolingList.html">Tooling List</a></li>
+                  <li><a href="detailedSchedule.html">Detailed Schedule</a></li>
+                </ul>
+            </ul>
+            <!-- Running status -->
+            <ul>
+                <a href="runningStatus.html"><li> 
+                    <span class="line-md--speedometer-loop1"></span>
+                    <h3>Running Status </h3>
+                    <span id="arrow" class="line-md--arrow-left" style="visibility: hidden;"></span> 
+                </li>
+               </a>
+            </ul>
+            <!-- Printing -->
+            <ul>
+                <a href="printing.html"><li> 
+                    <span class="line-md--cloud-alt-print-loop1"></span>
+                    <h3>Printing </h3>
+                    <span id="arrow" class="line-md--arrow-left" style="visibility: hidden;"></span> 
+                </li>
+               </a>
+            </ul>
+            <!-- Molding -->
+            <ul>
+                <a href="molding.html"><li> 
+                    <span class="line-md--engine1"></span>
+                    <h3>Molding </h3> 
+                    <span id="arrow" class="line-md--arrow-left" style="visibility: hidden;"></span> 
+                </li>
+               </a>
+            </ul>
+           
+            <!-- attendance -->
+            <ul>
+                <a href="attendance.html"><li> 
+                    <span class="line-md--account1"></span>
+                    <h3>Attendance </h3>
+                    <span id="arrow" class="line-md--arrow-left" style="visibility: hidden;"></span> 
+                   
+                </li>
+               </a>
+            </ul>
+            <!-- logout -->
+            <ul>
+                <a href="homepage.html"><li> 
+                    <span class="line-md--log-out"></span>
+                    <h3>Logout </h3>
+                </li>
+               </a>
+            </ul>
+        </nav>
+
+        <article id="dashboard">
+            <div class="main">
+                <div class="card">
+                    <span class="line-md--arrows-horizontal"></span>
+                    <h3>Daily Transfer</h3>
+                </div>
+                <a href="dashboardAttendance.html" class="card">
+                        <span class="line-md--account"></span>
+                        <h3>Attendance</h3>
+                </a>
+                <div class="card">
+                    <span class="line-md--speedometer-loop"></span>
+                    <h3>Running Status</h3>
+                </div>
+                <div class="card">
+                    <span class="line-md--cloud-alt-print-loop"></span>
+                    <h3>Printing</h3>
+                </div>
+            </div>
+    
+        </article>
+      
+    
+    </main>
+</body>
+</html>

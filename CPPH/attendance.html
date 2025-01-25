@@ -1,0 +1,211 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Doughnut Chart Example</title>
+      <link rel="stylesheet" href="dashboard.css">
+      <script src="app.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+      
+  <script>
+    document.getElementById("fileInput").addEventListener("change", function (e) {
+      const file = e.target.files[0];
+      if (file) {
+        Papa.parse(file, {
+          complete: function (result) {
+            console.log(result.data); // result.data contains the parsed CSV as an array of objects
+          },
+          header: true, // Ensures the first row is used as column headers
+          skipEmptyLines: true, // Skips empty lines in the CSV file
+          dynamicTyping: true, // Automatically converts data types where applicable (e.g., strings to numbers)
+          // If you want to specifically ensure that these headers exist in your file, you can log them:
+          step: function(row) {
+            console.log(row.data); // You can inspect each row as it's parsed
+          }
+        });
+      }
+    });
+  </script>
+
+      
+  </head>
+
+      <header >
+          <picture>
+                <img class="logo" src="logo.jpg" alt="Calcomp Logo">
+                <img class="name" src="name.jpg" alt="Calcomp Name">
+            </picture>
+                <!-- <button onclick="myFunction()"><span class="line-md--align-justify"></span> </button></div> -->
+        </header>
+      
+      <body>
+          <main class="divider">
+              <nav id="sidebar" class="sidebar">
+                  <!-- dashboard -->
+                  <ul>
+                      <li onclick="dashboardDropdown()">
+                          <span class="line-md--text-box1"></span>
+                          <h3>Dashboard </h3>
+                          <span id="arrow" class="line-md--arrow-left"></span> 
+                      </li>
+                      <ul id="dashboardDropdown">
+                        <li><a href="dashboardDailyTransfer.html">Daily Transfer</a></li>
+                        <li><a href="dashboardOutput.html">Output Monitoring</a></li>
+                        <li><a href="dashboardStatus.html">Overall Status</a></li>
+                        <li><a href="dashboardPrinting.html">Printing</a></li>
+                        <li><a href="dashboardAttendance.html">Attendance</a></li>
+                      </ul>
+                  </ul>
+                  <!-- daily transfer -->
+                  <ul>
+                      <a href="dailyTransfer.html"><li> 
+                          <span class="line-md--arrows-horizontal1"></span>
+                          <h3>Daily Transfer </h3>
+                          <span id="arrow" class="line-md--arrow-left"></span> 
+                      </li>
+                    </a>
+                  </ul>
+                  <!-- Tooling -->
+                  <ul>
+                      <li onclick="toolingDropdown()"> 
+                          <span class="line-md--cog-loop1"></span>
+                          <h3>Tooling </h3>
+                          <span id="arrow" class="line-md--arrow-left"></span> 
+                      </li>
+                      <ul id="toolingDropdown">
+                        <li><a href="registration.html">Registration List</a></li>
+                        <li><a href="toolingList.html">Tooling List</a></li>
+                        <li><a href="detailedSchedule.html">Detailed Schedule</a></li>
+                      </ul>
+                  </ul>
+                  <!-- Running status -->
+                  <ul>
+                      <a href="runningStatus.html"><li> 
+                          <span class="line-md--speedometer-loop1"></span>
+                          <h3>Running Status </h3>
+                          <span id="arrow" class="line-md--arrow-left" style="visibility: hidden;"></span> 
+                      </li>
+                    </a>
+                  </ul>
+                  <!-- Printing -->
+                  <ul>
+                      <a href="printing.html"><li> 
+                          <span class="line-md--cloud-alt-print-loop1"></span>
+                          <h3>Printing </h3>
+                          <span id="arrow" class="line-md--arrow-left" style="visibility: hidden;"></span> 
+                      </li>
+                    </a>
+                  </ul>
+                  <!-- Molding -->
+                  <ul>
+                      <a href="molding.html"><li> 
+                          <span class="line-md--engine1"></span>
+                          <h3>Molding </h3> 
+                          <span id="arrow" class="line-md--arrow-left" style="visibility: hidden;"></span> 
+                      </li>
+                    </a>
+                  </ul>
+                
+                  <!-- attendance -->
+                  <ul>
+                      <a href="attendance.html"><li> 
+                          <span class="line-md--account1"></span>
+                          <h3>Attendance </h3>
+                          <span id="arrow" class="line-md--arrow-left" style="visibility: hidden;"></span> 
+                        
+                      </li>
+                    </a>
+                  </ul>
+                  <!-- logout -->
+                  <ul>
+                      <a href="homepage.html"><li> 
+                          <span class="line-md--log-out"></span>
+                          <h3>Logout </h3>
+                      </li>
+                    </a>
+                  </ul>
+              </nav>
+          <article id="dashboard">
+            <p>CPPH ATTENDANCE STATUS</p>
+          <section>
+
+              <div class="container">
+                  <div class="search">
+                  <input id="searchInput" type="text" onkeyup="searchData()" placeholder="Search...">
+                  <button type="submit"><span class="line-md--search"></span></button>
+                  </div>
+              </div>
+
+          
+              <input type="file" id="fileInput" />
+
+              <div id="overlay">
+                <div id="overlayMessage">Processing file, please wait...</div>
+              </div>
+              <div id="fileProcessedNotification">File successfully processed and displayed!</div>
+          
+              <article class="attendance-table">
+              <table id="csvTable">
+                  <thead>
+                  </thead>
+                <tbody>
+                </tbody>
+              </table>
+
+              <div id="paginationControls">
+                <button id="prevPage" onclick="changePage(-1)"><span class="line-md--arrow-small-left"></span></button>
+                <span id="pageInfo"></span>
+                <button id="nextPage" onclick="changePage(1)"><span class="line-md--arrow-small-right"></span></button>
+              </div>
+              <div class="results-count" id="resultsCount">Results found: 0</div>
+            </article>
+          </section>
+          </article>
+      </main>
+
+   <script>
+    document.getElementById("paginationControls").style.display = 'none';
+    document.getElementById("resultsCount").style.display = 'none';
+  
+    document.getElementById("fileInput").addEventListener("change", function (e) {
+  const file = e.target.files[0];
+  if (file) {
+    
+  // Hide the file processed notification
+  document.getElementById('fileProcessedNotification').style.display = 'none';
+
+  // Optionally, hide the overlay if already visible (in case user clicks after a failed attempt)
+  document.getElementById('overlay').style.display = 'none';
+    
+    Papa.parse(file, {
+      complete: function (result) {
+        // Check if the data exists
+        if (result.data.length > 0) {
+          createTable(result.data); // Create the table using parsed data
+
+          // Optionally show a success message in the notification
+          showProcessedMessage("File successfully processed and displayed!", "success");
+        } else {
+          showProcessedMessage("Error: No data found in the file.", "error");
+        }
+
+        // Hide overlay and notification after table creation
+        setTimeout(() => {
+          document.getElementById('overlay').style.display = 'none'; // Hide the overlay
+          document.getElementById('fileProcessedNotification').style.display = 'none'; // Hide the notification
+        }, 1000); // Adjust the delay to give some time for the table to render (1 second)
+      },
+      header: true,
+      skipEmptyLines: true,
+      dynamicTyping: true,
+    });
+  }
+});
+function updateResultsCount(count) {
+  const resultsCountDisplay = document.getElementById("resultsCount");
+  resultsCountDisplay.textContent = `Results found: ${count}`;
+}
+  </script>
+  </body>
+  </html>

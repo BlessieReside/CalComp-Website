@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Attendance with Charts</title>
+    
+    <!-- Include PapaParse -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+
+    <!-- Include Google Charts -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="dashboardAttendance.css">
+
+    <script type="text/javascript">
+        // Load the Visualization API and the corechart package
+        google.charts.load('current', { packages: ['corechart'] });
+
+        // Set a callback to run when the Google Charts library is loaded
+        google.charts.setOnLoadCallback(function() {
+            // Set the chart rendering function to call after file parsing
+            document.getElementById("fileInput").addEventListener("change", function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Parse the CSV file
+                    Papa.parse(file, {
+                        header: true, // Use the first row as headers
+                        skipEmptyLines: true, // Skip empty lines
+                        complete: function(result) {
+                            console.log("Parsed Data:", result.data); // Log parsed data
+
+                            // Count shifts from parsed data
+                            const shiftCounts = countShifts(result.data);
+
+                            // Log the counts for debugging
+                            console.log("Shift Counts:", shiftCounts);
+
+                            // Create DataTable for the donut chart
+                            const data = google.visualization.arrayToDataTable([
+                                ['Shift', 'Headcount'],
+                                ['Day Shift', shiftCounts.d],
+                                ['Night Shift', shiftCounts.n]
+                            ]);
+
+                            // Set chart options for the donut chart
+                            const options = {
+                                title: 'Headcount by Shift',
+                                pieHole: 0.4,  // Set the size of the donut hole
+                                legend: { position: 'bottom' },  // Adjust legend position
+                                colors: ['#FFFF00', '#191970']  // Set colors for day and night shifts
+                            };
+
+                            // Instantiate and draw the donut chart
+                            const chart = new google.visualization.PieChart(document.getElementById('donut_chart'));
+                            chart.draw(data, options);
+
+                            // Create DataTable for the bar chart
+                            const barData = google.visualization.arrayToDataTable([
+                                ['Dept Name', 'Present (%)', 'Absent (%)'],
+                                ['Day Shift', shiftCounts.d],
+                                ['Night Shift', shiftCounts.n]
+                            ]);
+
+                            // Set chart options for the bar chart
+                            const barOptions = {
+                                title: 'Employee Attendance Status by Shift',
+                                width: 800,
+                                height: 400,
+                                isStacked: true, // Stack the bars for Present and Absent
+                                colors: ['#1b9e77', '#d95f02'], // Color for bars
+                                vAxis: { title: 'Percentage (%)' },
+                                hAxis: { title: 'Shift' },
+                            };
+
+                            // Instantiate and draw the bar chart
+                            const barChart = new google.visualization.ColumnChart(document.getElementById('bar_chart'));
+                            barChart.draw(barData, barOptions);
+                        },
+                        error: function(error) {
+                            console.error("Error parsing CSV:", error.message);
+                        }
+                    });
+                }
+            });
+        });
+
+        // Function to count shifts from data
+        function countShifts(data) {
+            // Initialize shift counts
+            const shiftCount = { d: 0, n: 0 };
+
+            // Iterate through data rows and count shifts
+            data.forEach(row => {
+                const shift = row['Shift']; // Assuming the column name is 'Shift'
+
+                if (shift && shift.trim().toLowerCase() === 'd') {
+                    shiftCount.d++;
+                } else if (shift && shift.trim().toLowerCase() === 'n') {
+                    shiftCount.n++;
+                }
+            });
+
+            // Return the shift counts
+            return shiftCount;
+        }
+    </script>
+</head>
+<body>
+    <!-- Header with logo and name -->
+    <header>
+        <picture>
+            <img class="logo" src="logo.jpg" alt="Calcomp Logo">
+            <img class="name" src="name.jpg" alt="Calcomp Name">
+        </picture>
+    </header>
+
+    <!-- Main content container -->
+    <main class="container">
+        <!-- Sidebar Navigation -->
+        <nav id="sidebar" class="sidebar">
+            <!-- dashboard -->
+            <ul>
+                <li onclick="dashboardDropdown()">
+                    <span class="line-md--text-box1"></span>
+                    <h3>Dashboard </h3>
+                    <span id="arrow" class="line-md--arrow-left"></span> 
+                </li>
+                <ul id="dashboardDropdown">
+                  <li><a href="dashboardDailyTransfer.html">Daily Transfer</a></li>
+                  <li><a href="dashboardOutput.html">Output Monitoring</a></li>
+                  <li><a href="dashboardStatus.html">Overall Status</a></li>
+                  <li><a href="dashboardPrinting.html">Printing</a></li>
+                  <li><a href="dashboardAttendance.html">Attendance</a></li>
+                </ul>
+            </ul>
+            <!-- daily transfer -->
+            <ul>
+                <a href="dailyTransfer.html"><li> 
+                    <span class="line-md--arrows-horizontal1"></span>
+                    <h3>Daily Transfer </h3>
+                    <span id="arrow" class="line-md--arrow-left"></span> 
+                </li>
+              </a>
+            </ul>
+            <!-- Tooling -->
+            <ul>
+                <li onclick="toolingDropdown()"> 
+                    <span class="line-md--cog-loop1"></span>
+                    <h3>Tooling </h3>
+                    <span id="arrow" class="line-md--arrow-left"></span> 
+                </li>
+                <ul id="toolingDropdown">
+                  <li><a href="registration.html">Registration List</a></li>
+                  <li><a href="toolingList.html">Tooling List</a></li>
+                  <li><a href="detailedSchedule.html">Detailed Schedule</a></li>
+                </ul>
+            </ul>
+            <!-- Running status -->
+            <ul>
+                <a href="runningStatus.html"><li> 
+                    <span class="line-md--speedometer-loop1"></span>
+                    <h3>Running Status </h3>
+                    <span id="arrow" class="line-md--arrow-left" style="visibility: hidden;"></span> 
+                </li>
+              </a>
+            </ul>
+            <!-- Printing -->
+            <ul>
+                <a href="printing.html"><li> 
+                    <span class="line-md--cloud-alt-print-loop1"></span>
+                    <h3>Printing </h3>
+                    <span id="arrow" class="line-md--arrow-left" style="visibility: hidden;"></span> 
+                </li>
+              </a>
+            </ul>
+            <!-- Molding -->
+            <ul>
+                <a href="molding.html"><li> 
+                    <span class="line-md--engine1"></span>
+                    <h3>Molding </h3> 
+                    <span id="arrow" class="line-md--arrow-left" style="visibility: hidden;"></span> 
+                </li>
+              </a>
+            </ul>
+          
+            <!-- attendance -->
+            <ul>
+                <a href="attendance.html"><li> 
+                    <span class="line-md--account1"></span>
+                    <h3>Attendance </h3>
+                    <span id="arrow" class="line-md--arrow-left" style="visibility: hidden;"></span> 
+                  
+                </li>
+              </a>
+            </ul>
+            <!-- logout -->
+            <ul>
+                <a href="homepage.html"><li> 
+                    <span class="line-md--log-out"></span>
+                    <h3>Logout </h3>
+                </li>
+              </a>
+            </ul>
+        </nav>
+
+        <!-- Main article content -->
+        <article id="attendance">
+            <p>Dashboard Attendance</p>
+            <!-- File input for CSV upload -->
+            <input type="file" id="fileInput" />
+            <!-- Div to display the charts -->
+            <div class="charts">
+                <div id="donut_chart"></div>
+                <div id="bar_chart"></div>
+            </div>
+        </article>
+    </main>
+</body>
+</html>

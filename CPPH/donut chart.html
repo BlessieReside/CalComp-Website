@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard with Attendance and Department Count</title>
+    
+    <!-- Include PapaParse -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+
+    <!-- Include Google Charts -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <!-- Custom CSS (optional, based on your needs) -->
+    <link rel="stylesheet" href="dashboardAttendance.css">
+
+    <script type="text/javascript">
+        // Load the Visualization API and the corechart package
+        google.charts.load('current', { packages: ['corechart', 'bar'] });
+
+        // Set callback to run when the Google Charts library is loaded
+        google.charts.setOnLoadCallback(function() {
+            document.getElementById("fileInput").addEventListener("change", function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Parse the CSV file
+                    Papa.parse(file, {
+                        header: true, // Use first row as headers
+                        skipEmptyLines: true, // Skip empty lines
+                        complete: function(result) {
+                            console.log("Parsed Data:", result.data); // Log parsed data
+
+                            // Count shifts from parsed data for attendance chart
+                            const shiftCounts = countShifts(result.data);
+                            // Count members per department for department chart
+                            const departmentCounts = countMembersByDepartment(result.data);
+
+                            // Log counts for debugging
+                            console.log("Shift Counts:", shiftCounts);
+                            console.log("Department Counts:", departmentCounts);
+
+                            // Create DataTable for the donut chart (attendance by shift)
+                            const attendanceData = google.visualization.arrayToDataTable([
+                                ['Shift', 'Headcount'],
+                                ['Day Shift', shiftCounts.d],
+                                ['Night Shift', shiftCounts.n]
+                            ]);
+
+                            // Set options for donut chart
+                            const attendanceOptions = {
+                                title: 'Headcount by Shift',
+                                pieHole: 0.4,
+                                legend: { position: 'bottom' },
+                                colors: ['#FFFF00', '#191970']
+                            };
+
+                            // Draw the donut chart
+                            const donutChart = new google.visualization.PieChart(document.getElementById('donut_chart'));
+                            donutChart.draw(attendanceData, attendanceOptions);
+
+                            // Create DataTable for the attendance bar chart
+                            const attendanceBarData = google.visualization.arrayToDataTable([
+                                ['Dept Name', 'Present (%)', 'Absent (%)'],
+                                ['Day Shift', shiftCounts.d],
+                                ['Night Shift', shiftCounts.n]
+                            ]);
+
+                            // Set options for bar chart
+                            const attendanceBarOptions = {
+                                title: 'Employee Attendance Status by Shift',
+                                width: 800,
+                                height: 400,
+                                isStacked: true,
+                                colors: ['#1b9e77', '#d95f02'],
+                                vAxis: { title: 'Percentage (%)' },
+                                hAxis: { title: 'Shift' },
+                            };
+
+                            // Draw the attendance bar chart
+                            const attendanceBarChart = new google.visualization.ColumnChart(document.getElementById('bar_chart'));
+                            attendanceBarChart.draw(attendanceBarData, attendanceBarOptions);
+
+                            // Generate department member count chart
+                            const departmentColors = generateDepartmentColors(departmentCounts);
+
+                            // Create DataTable for the department member count chart
+                            const departmentData = google.visualization.arrayToDataTable([
+                                ['Department', 'Members'],
+                                ...Object.entries(departmentCounts).map(([department, count]) => [department, count])
+                            ]);
+
+                            // Column chart options for department member count
+                            const departmentOptions = {
+                                title: 'Number of Members per Department',
+                                chartArea: { width: '50%' },
+                                vAxis: { title: 'Number of Members', minValue: 0 },
+                                hAxis: { title: 'Department' },
+                                colors: Object.values(departmentColors)
+                            };
+
+                            // Draw the department member count bar chart
+                            const departmentChart = new google.visualization.ColumnChart(document.getElementById('department_chart'));
+                            departmentChart.draw(departmentData, departmentOptions);
+                        },
+                        error: function(error) {
+                            console.error("Error parsing CSV:", error.message);
+                        }
+                    });
+                }
+            });
+        });
+
+        // Function to count shifts from data for attendance chart
+        function countShifts(data) {
+            const shiftCount = { d: 0, n: 0 };
+            data.forEach(row => {
+                const shift = row['Shift'];
+                if (shift && shift.trim().toLowerCase() === 'd') {
+                    shiftCount.d++;
+                } else if (shift && shift.trim().toLowerCase() === 'n') {
+                    shiftCount.n++;
+                }
+            });
+            return shiftCount;
+        }
+
+        // Function to count members by department for department chart
+        function countMembersByDepartment(data) {
+            const departmentCounts = {};
+            data.forEach(row => {
+                const department = row['Dept Name'];
+                if (department) {
+                    departmentCounts[department] = (departmentCounts[department] || 0) + 1;
+                }
+            });
+            return departmentCounts;
+        }
+
+        // Function to generate unique colors for each department
+        function generateDepartmentColors(departmentCounts) {
+            const departmentColors = {};
+            const predefinedColors = ['#FF5733', '#33FF57', '#3357FF', '#FF33A6', '#FFC300', '#33FFCE', '#9C33FF'];
+            Object.keys(departmentCounts).forEach((department, index) => {
+                departmentColors[department] = predefinedColors[index % predefinedColors.length];
+            });
+            return departmentColors;
+        }
+    </script>
+</head>
+<body>
+    <!-- Header with logo and name -->
+    <header>
+        <picture>
+            <img class="logo" src="logo.jpg" alt="Logo">
+            <img class="name" src="name.jpg" alt="Name">
+        </picture>
+    </header>
+
+    <!-- Main content container -->
+    <main class="container">
+        <!-- Sidebar Navigation -->
+        <nav id="sidebar" class="sidebar">
+            <!-- You can keep your sidebar navigation content here -->
+        </nav>4
+
+        <!-- Main article content -->
+        <article id="dashboard">
+            <p>Dashboard</p>
+
+            <!-- File input for CSV upload -->
+            <input type="file" id="fileInput" />
+            
+            <!-- Divs to display the charts -->
+            <div class="charts">
+                <div id="donut_chart" style="width: 500px; height: 1000px;"></div>
+                <div id="bar_chart" style="width: 800px; height: 1000px;"></div>
+                <div id="department_chart" style="width: 900px; height: 5100px;"></div>
+            </div>
+        </article>
+    </main>
+</body>
+</html>
