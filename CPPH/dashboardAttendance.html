@@ -4,108 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Attendance with Charts</title>
-    
+    <link rel="stylesheet" href="dashboardAttendance.css">
     <!-- Include PapaParse -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-
     <!-- Include Google Charts -->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="dashboardAttendance.css">
-
-    <script type="text/javascript">
-        // Load the Visualization API and the corechart package
-        google.charts.load('current', { packages: ['corechart'] });
-
-        // Set a callback to run when the Google Charts library is loaded
-        google.charts.setOnLoadCallback(function() {
-            // Set the chart rendering function to call after file parsing
-            document.getElementById("fileInput").addEventListener("change", function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    // Parse the CSV file
-                    Papa.parse(file, {
-                        header: true, // Use the first row as headers
-                        skipEmptyLines: true, // Skip empty lines
-                        complete: function(result) {
-                            console.log("Parsed Data:", result.data); // Log parsed data
-
-                            // Count shifts from parsed data
-                            const shiftCounts = countShifts(result.data);
-
-                            // Log the counts for debugging
-                            console.log("Shift Counts:", shiftCounts);
-
-                            // Create DataTable for the donut chart
-                            const data = google.visualization.arrayToDataTable([
-                                ['Shift', 'Headcount'],
-                                ['Day Shift', shiftCounts.d],
-                                ['Night Shift', shiftCounts.n]
-                            ]);
-
-                            // Set chart options for the donut chart
-                            const options = {
-                                title: 'Headcount by Shift',
-                                pieHole: 0.4,  // Set the size of the donut hole
-                                legend: { position: 'bottom' },  // Adjust legend position
-                                colors: ['#FFFF00', '#191970']  // Set colors for day and night shifts
-                            };
-
-                            // Instantiate and draw the donut chart
-                            const chart = new google.visualization.PieChart(document.getElementById('donut_chart'));
-                            chart.draw(data, options);
-
-                            // Create DataTable for the bar chart
-                            const barData = google.visualization.arrayToDataTable([
-                                ['Dept Name', 'Present (%)', 'Absent (%)'],
-                                ['Day Shift', shiftCounts.d],
-                                ['Night Shift', shiftCounts.n]
-                            ]);
-
-                            // Set chart options for the bar chart
-                            const barOptions = {
-                                title: 'Employee Attendance Status by Shift',
-                                width: 800,
-                                height: 400,
-                                isStacked: true, // Stack the bars for Present and Absent
-                                colors: ['#1b9e77', '#d95f02'], // Color for bars
-                                vAxis: { title: 'Percentage (%)' },
-                                hAxis: { title: 'Shift' },
-                            };
-
-                            // Instantiate and draw the bar chart
-                            const barChart = new google.visualization.ColumnChart(document.getElementById('bar_chart'));
-                            barChart.draw(barData, barOptions);
-                        },
-                        error: function(error) {
-                            console.error("Error parsing CSV:", error.message);
-                        }
-                    });
-                }
-            });
-        });
-
-        // Function to count shifts from data
-        function countShifts(data) {
-            // Initialize shift counts
-            const shiftCount = { d: 0, n: 0 };
-
-            // Iterate through data rows and count shifts
-            data.forEach(row => {
-                const shift = row['Shift']; // Assuming the column name is 'Shift'
-
-                if (shift && shift.trim().toLowerCase() === 'd') {
-                    shiftCount.d++;
-                } else if (shift && shift.trim().toLowerCase() === 'n') {
-                    shiftCount.n++;
-                }
-            });
-
-            // Return the shift counts
-            return shiftCount;
+    <style>
+        /* Flexbox layout to display charts side by side */
+        .charts {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
         }
-    </script>
+
+        /* Style for each chart */
+        .chart-container {
+            width: 48%; /* 2 charts will take up 48% of the width each */
+            height: 400px;
+        }
+    </style>
 </head>
 <body>
     <!-- Header with logo and name -->
@@ -118,7 +36,6 @@
 
     <!-- Main content container -->
     <main class="container">
-        <!-- Sidebar Navigation -->
         <nav id="sidebar" class="sidebar">
             <!-- dashboard -->
             <ul>
@@ -205,17 +122,152 @@
             </ul>
         </nav>
 
-        <!-- Main article content -->
+    
         <article id="attendance">
             <p>Dashboard Attendance</p>
             <!-- File input for CSV upload -->
             <input type="file" id="fileInput" />
             <!-- Div to display the charts -->
             <div class="charts">
-                <div id="donut_chart"></div>
-                <div id="bar_chart"></div>
+                <div class="chart-container" id="donut_chart"></div>
+                <div class="chart-container" id="bar_chart"></div>
             </div>
         </article>
     </main>
+
+    <!-- Chart rendering script -->
+ <script type="text/javascript">
+        // Load Google Charts
+        google.charts.load('current', { packages: ['corechart', 'bar'] });
+
+        // Set callback to run when Google Charts is loaded
+        google.charts.setOnLoadCallback(function() {
+            document.getElementById("fileInput").addEventListener("change", function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Parse the CSV file
+                    Papa.parse(file, {
+                        header: true,
+                        skipEmptyLines: true,
+                        complete: function(result) {
+                            console.log("Parsed Data:", result.data); // Log parsed data
+
+                            // Generate Donut Chart (Attendance by Shift)
+                            generateDonutChart(result.data);
+                            // Generate Bar Chart (Number of Members per Department)
+                            generateBarChart(result.data);
+                        },
+                        error: function(error) {
+                            console.error("Error parsing CSV:", error.message);
+                        }
+                    });
+                }
+            });
+        });
+
+        // Function to generate Donut Chart (Attendance by Shift)
+function generateDonutChart(data) {
+            // Count attendance by shift (Example: 'Day' or 'Night')
+            const shiftCounts = { Day: 0, Night: 0 };
+            data.forEach(row => {
+                // Adjust according to how your shift data is represented in your CSV
+                if (row['Shift'] === 'D') {
+                    shiftCounts.Day++;
+                } else if (row['Shift'] === 'N') {
+                    shiftCounts.Night++;
+                }
+            });
+
+            // Prepare data for the donut chart
+            const donutData = google.visualization.arrayToDataTable([
+                ['Shift', 'Headcount'],
+                ['Day Shift', shiftCounts.Day],
+                ['Night Shift', shiftCounts.Night]
+            ]);
+
+            // Set chart options for donut chart
+            const donutOptions = {
+                title: 'Headcount by Shift',
+                pieHole: 0.4,
+                colors: ['#FFD700', '#191970'],
+                legend: { position: 'bottom' },
+                backgroundColor: { fill: 'transparent' },
+                titleTextStyle: {
+                position:'center',
+                color: '#EAEAEA', // Set title text color to dirty white
+                fontSize: 20, // Set title font size
+                fontWeight: 'bold', // Set title font weight to bold
+                fontName: 'Arial' // Set title font family (optional)
+            },
+            legend: {
+                position: 'bottom',
+                textStyle: {
+                    color: '#EAEAEA', // Set legend text color to dirty white
+                    fontSize: 14, // Set legend font size
+                    fontWeight: 'bold', // Set legend font weight to bold
+                    fontName: 'Arial' // Set legend font family (optional)
+                }
+            },
+            titlePosition: 'justify' 
+            };
+
+            // Create and draw the donut chart
+            const donutChart = new google.visualization.PieChart(document.getElementById('donut_chart'));
+            donutChart.draw(donutData, donutOptions);
+        }
+        function generateBarChart(data) {
+    // Count the number of members per department
+    const departmentCounts = {};
+    data.forEach(row => {
+        const department = row['Dept Name'];
+        if (department) {
+            departmentCounts[department] = (departmentCounts[department] || 0) + 1;
+        }
+    });
+
+    // Prepare data for the stacked bar chart
+    const barData = [['Department', 'Member Count']];
+    Object.entries(departmentCounts).forEach(([department, count]) => {
+        barData.push([department, count]);
+    });
+
+    // Convert data into a format Google Charts understands
+    const googleBarData = google.visualization.arrayToDataTable(barData);
+
+    // Set options for the stacked column chart (which is vertically stacked)
+    const barOptions = {
+        title: 'Number of Members per Department',
+        isStacked: true,  // Enables stacked bars
+        vAxis: { title: 'Number of Members' }, // Vertical axis now represents 'Number of Members'
+        hAxis: { title: 'Department' },        // Horizontal axis now represents 'Department'
+        colors: ['#1b9e77'],  // Can add more colors for multiple stacks if needed
+        chartArea: { width: '80%' }, // Optional: Adjust legend position if you have multiple categories
+        backgroundColor: { fill: 'transparent' },
+        titleTextStyle: {
+                position:'center',
+                color: '#EAEAEA', // Set title text color to dirty white
+                fontSize: 20, // Set title font size
+                fontWeight: 'bold', // Set title font weight to bold
+                fontName: 'Arial' // Set title font family (optional)
+        },
+        legend: {
+                position: 'bottom',
+                textStyle: {
+                    color: '#EAEAEA', // Set legend text color to dirty white
+                    fontSize: 14, // Set legend font size
+                    fontWeight: 'bold', // Set legend font weight to bold
+                    fontName: 'Arial' // Set legend font family (optional)
+                }
+            },
+    };
+
+    // Create and draw the stacked column chart
+    const barChart = new google.visualization.ColumnChart(document.getElementById('bar_chart'));
+    barChart.draw(googleBarData, barOptions);
+}
+
+
+
+    </script>
 </body>
 </html>
