@@ -1,6 +1,5 @@
 /* dashboard attendance  */
 
-
 header{
     overflow: hidden;
     position: fixed;
@@ -422,11 +421,12 @@ main{
 
 
 article{
+    width:80%;
     display: flex;
     flex-direction: column;
      /* background-color: aqua; */
      position: relative;
-     left: 20%;
+     left: 18%;
      top: 15vh;
      overflow-y: auto; 
      max-height: calc(100vh - 100px);
@@ -435,22 +435,15 @@ article{
     display: flex;
     flex-direction: column;
     padding:10px;
-    align-items: center;
-    align-self: center;
-    gap: 5%;
+    /* align-items: center; */
+    /* align-self: center; */
+    /* gap: 10%; */
     margin-top: 20px;
-    width: 900px;
-    height: 55%;
-    background-color:blue;
+    width: 100%;
+    height: 100vh;
+    /* background-color:blue; */
 }
 
-#piechart{
-    width: 900px; 
-    height: 500px;
-    padding-top:60px;
-    margin: 0;
-   
-}
 
 .shift-card {
     background-color: #333;
@@ -474,7 +467,7 @@ article{
   }
 
   .donut-chart svg {
-    width: 100%;
+    width: 50%;
     height: 100%;
   }
 
@@ -494,3 +487,31 @@ article{
     font-size: 24px;
     font-weight: bold;
   }
+#bar_chart{
+    width: 160vh;
+    height: 100vh;
+    margin-top: 40px;
+    background-color: transparent; 
+    
+}
+#donut_chart{
+    background-color: transparent; 
+}
+/* Style the chart title */
+#bar_chart .google-visualization-title {
+    font-size: 24px;         /* Font size */
+    color: #f3f0f0;          /* Text color */
+    font-weight: bold;       /* Bold font */
+    text-align: justify;      /* Center the title */
+    margin-bottom: 20px;     /* Space below the title */
+}
+#donut_chart .google-visualization{
+    font-size: 24px;         /* Font size */
+    color: #eee8e8;          /* Text color */
+    font-weight: bold;       /* Bold font */
+    text-align: center;      /* Center the title */
+    margin-bottom: 20px;     /* Space below the title */
+    background-color: transparent; 
+}
+
+
