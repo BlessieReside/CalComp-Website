@@ -83,6 +83,46 @@
             displayTable(filteredRows);
             updateResultsCount(filteredRows.length);
         }
+        const checkForChangesUrl = 'https://script.google.com/macros/s/AKfycbyaqxaDosUixIgKowcucdWJnri_lDS7j8XPH6WFsy8QkD7iqpjdHv8964D__Fte8NP4Zg/exec'; // Replace with your actual Web App URL
+        
+        // Function to poll for changes every 10 seconds
+        function pollForChanges() {
+            fetch(checkForChangesUrl)
+                .then(response => response.text())
+                .then(data => {
+                    if (data === 'true') {
+                        // Refresh the page if changes are detected
+                        window.location.reload(true);
+                    }else{
+                        setTimeout(pollForChanges,1000)
+                    }
+                })
+                .catch(err => console.error('Error checking for changes:', err));
+        }
+
+        // Poll every 10 seconds (you can adjust this interval)
+        // setInterval(pollForChanges, 10000);
+        window.onload = function(){
+            pollForChanges();
+        }
+    // function fetchSheetUpdates() {
+    //   // Your webhook endpoint or server URL (you can use Webhook.site URL here)
+    //   const webhookUrl = 'https://webhook.site/#!/view/53f8c105-9ac5-4a89-be37-4f5b5544e619/aab4395d-e3cf-4f14-bb2e-d05c372c6417/1';  // Replace with the actual webhook URL you used in Apps Script
+
+    //   // Fetch the data from the endpoint
+    //   fetch(webhookUrl)
+    //     .then(response => response.json())
+    //     .then(data => {
+    //       console.log('Received data:', data);
+    //       document.getElementById('data').innerText = JSON.stringify(data, null, 2);
+    //     })
+    //     .catch(error => {
+    //       console.error('Error fetching data:', error);
+    //     });
+    // }
+
+    // // Set an interval to check for updates every 3 seconds
+    // setInterval(fetchSheetUpdates, 1000); 
       </script>
    
   </head>
@@ -90,7 +130,7 @@
       <header >
           <picture>
                 <img class="logo" src="logo.jpg" alt="Calcomp Logo">
-                <img class="name" src="name.jpg" alt="Calcomp Name">
+                <img class="name" src="Name.png" alt="Calcomp Name">
             </picture>
                 <!-- <button onclick="myFunction()"><span class="line-md--align-justify"></span> </button></div> -->
         </header>
@@ -186,13 +226,13 @@
             <p>CPPH ATTENDANCE STATUS</p>
           <section>
 
-            <div class="container">
-                <div class="search">
-                    <input id="searchInput" type="text" placeholder="Search.." onkeyup="searchData()">
-                    <button>Search</button> <!-- Button is optional, the input field is key -->
-                </div>
-            </div>
-            
+             <div class="container">
+    <div class="search">
+        <input id="searchInput" type="text" placeholder="Search.." onkeyup="searchData()">
+        <button>Search</button> <!-- Button is optional, the input field is key -->
+    </div>
+</div>
+
 
                  <!-- Table to display Google Sheets data -->
                  <article class="attendance-table">
