@@ -30,7 +30,7 @@
     <header>
         <picture>
             <img class="logo" src="logo.jpg" alt="Calcomp Logo">
-            <img class="name" src="name.jpg" alt="Calcomp Name">
+            <img class="name" src="Name.png" alt="Calcomp Name">
         </picture>
     </header>
 
@@ -59,10 +59,10 @@
                     <h3>Daily Transfer </h3>
                     <span id="arrow" class="line-md--arrow-left"></span> 
                 </li>
-              </a>
+               </a>
             </ul>
-            <!-- Tooling -->
-            <ul>
+             <!-- Tooling -->
+             <ul>
                 <li onclick="toolingDropdown()"> 
                     <span class="line-md--cog-loop1"></span>
                     <h3>Tooling </h3>
@@ -81,7 +81,7 @@
                     <h3>Running Status </h3>
                     <span id="arrow" class="line-md--arrow-left" style="visibility: hidden;"></span> 
                 </li>
-              </a>
+               </a>
             </ul>
             <!-- Printing -->
             <ul>
@@ -90,7 +90,7 @@
                     <h3>Printing </h3>
                     <span id="arrow" class="line-md--arrow-left" style="visibility: hidden;"></span> 
                 </li>
-              </a>
+               </a>
             </ul>
             <!-- Molding -->
             <ul>
@@ -99,18 +99,18 @@
                     <h3>Molding </h3> 
                     <span id="arrow" class="line-md--arrow-left" style="visibility: hidden;"></span> 
                 </li>
-              </a>
+               </a>
             </ul>
-          
+           
             <!-- attendance -->
             <ul>
                 <a href="attendance.html"><li> 
                     <span class="line-md--account1"></span>
                     <h3>Attendance </h3>
                     <span id="arrow" class="line-md--arrow-left" style="visibility: hidden;"></span> 
-                  
+                   
                 </li>
-              </a>
+               </a>
             </ul>
             <!-- logout -->
             <ul>
@@ -118,156 +118,288 @@
                     <span class="line-md--log-out"></span>
                     <h3>Logout </h3>
                 </li>
-              </a>
+               </a>
             </ul>
         </nav>
 
-    
         <article id="attendance">
-            <p>Dashboard Attendance</p>
-            <!-- File input for CSV upload -->
-            <input type="file" id="fileInput" />
+            <h1>Dashboard Attendance</h1>
             <!-- Div to display the charts -->
+            <div class="main">
+                <div class="card">
+                    <h4>Head Count</h4>
+                    <p id="totalStaff"></p> 
+                </div>
+                <div class="card">
+                    <h4>Present</h4>
+                    <p id="presentStaff"></p> 
+                </div>
+                <div class="card">
+                    <h4>Absent</h4>
+                    <p id="absentStaff"></p> 
+                </div>
+            </div>
             <div class="charts">
+                <h4>Head Count By Shift</h4>
                 <div class="chart-container" id="donut_chart"></div>
-                <div class="chart-container" id="bar_chart"></div>
+                <h4>Total Number of Members per Department</h4>
+                <div class="chart-container" id="Totalbar_chart"></div>
+                <h4>Present / Absent per Department</h4>
+                <div class="chart-container" id="PresentBar_chart"></div>
+
             </div>
         </article>
     </main>
 
     <!-- Chart rendering script -->
- <script type="text/javascript">
+    <script type="text/javascript">
         // Load Google Charts
         google.charts.load('current', { packages: ['corechart', 'bar'] });
+        google.charts.setOnLoadCallback(fetchGoogleSheetData);
+        
+        // Google Sheets API setup
+          const API_KEY = 'AIzaSyBCfD09mGt484RJXh7WGR1IJaLH1xn1wtU '; // Your API Key from Google Cloud Console
+        const SPREADSHEET_ID = '1AhXSUdA-r3czXLA0pKpcMuvefZOJ_JFKTYukornGsws'; // Your Sheet ID
+        const RANGE = 'Data!A1:L2888'; // Range of data you want to access
 
-        // Set callback to run when Google Charts is loaded
-        google.charts.setOnLoadCallback(function() {
-            document.getElementById("fileInput").addEventListener("change", function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    // Parse the CSV file
-                    Papa.parse(file, {
-                        header: true,
-                        skipEmptyLines: true,
-                        complete: function(result) {
-                            console.log("Parsed Data:", result.data); // Log parsed data
-
-                            // Generate Donut Chart (Attendance by Shift)
-                            generateDonutChart(result.data);
-                            // Generate Bar Chart (Number of Members per Department)
-                            generateBarChart(result.data);
-                        },
-                        error: function(error) {
-                            console.error("Error parsing CSV:", error.message);
-                        }
-                    });
+        // Fetch Google Sheets data and render it
+        function fetchGoogleSheetData() {
+            fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${RANGE}?key=${API_KEY}`)
+            .then(response => response.json())
+            .then(data => {
+                const rows = data.values;
+                if (rows && rows.length) {
+                    // Generate the charts
+                    generateDonutChart(rows);
+                    generateTotalBarChart(rows);
+                    updateAttendanceStats(rows);
+                    generateStatusBarChart(rows);
+                } else {
+                    console.error('No data found in the spreadsheet.');
                 }
-            });
-        });
+            })
+            .catch(error => console.error('Error fetching Google Sheets data:', error));
+        }
 
         // Function to generate Donut Chart (Attendance by Shift)
-function generateDonutChart(data) {
-            // Count attendance by shift (Example: 'Day' or 'Night')
+        function generateDonutChart(data) {
             const shiftCounts = { Day: 0, Night: 0 };
             data.forEach(row => {
-                // Adjust according to how your shift data is represented in your CSV
-                if (row['Shift'] === 'D') {
+                if (row[9] === 'D') {  // Assuming the "Shift" data is in the 3rd column
                     shiftCounts.Day++;
-                } else if (row['Shift'] === 'N') {
+                } else if (row[9] === 'N') {
                     shiftCounts.Night++;
                 }
             });
 
-            // Prepare data for the donut chart
             const donutData = google.visualization.arrayToDataTable([
                 ['Shift', 'Headcount'],
                 ['Day Shift', shiftCounts.Day],
                 ['Night Shift', shiftCounts.Night]
             ]);
 
-            // Set chart options for donut chart
             const donutOptions = {
-                title: 'Headcount by Shift',
                 pieHole: 0.4,
                 colors: ['#FFD700', '#191970'],
-                legend: { position: 'bottom' },
+                legend: {
+                    position: 'bottom',
+                    textStyle: { color: 'white' }  // Set legend text color to white
+                },
                 backgroundColor: { fill: 'transparent' },
-                titleTextStyle: {
-                position:'center',
-                color: '#EAEAEA', // Set title text color to dirty white
-                fontSize: 20, // Set title font size
-                fontWeight: 'bold', // Set title font weight to bold
-                fontName: 'Arial' // Set title font family (optional)
-            },
-            legend: {
-                position: 'bottom',
-                textStyle: {
-                    color: '#EAEAEA', // Set legend text color to dirty white
-                    fontSize: 14, // Set legend font size
-                    fontWeight: 'bold', // Set legend font weight to bold
-                    fontName: 'Arial' // Set legend font family (optional)
+                
+                pieSliceTextStyle: {
+                    color: 'black'  ,
+                    fontSize: 14,
+                    bold: true,        
+                },
+                chartArea: {
+                    left: 50,                // Adjust left space for better positioning
+                    right: 50,               // Adjust right space for better positioning
+                    top: 50,                 // Adjust top space for better positioning of title
+                    bottom: 50               // Adjust bottom space
                 }
-            },
-            titlePosition: 'justify' 
             };
 
-            // Create and draw the donut chart
+
             const donutChart = new google.visualization.PieChart(document.getElementById('donut_chart'));
             donutChart.draw(donutData, donutOptions);
         }
-        function generateBarChart(data) {
-    // Count the number of members per department
-    const departmentCounts = {};
-    data.forEach(row => {
-        const department = row['Dept Name'];
-        if (department) {
-            departmentCounts[department] = (departmentCounts[department] || 0) + 1;
+
+        // Function to generate Bar Chart (Number of Members per Department)
+        function generateTotalBarChart(data) {
+            const departmentCounts = {};
+            data.forEach((row,index) => {
+                if (index === 0) return;
+                    const department = row[6];  // Assuming the "Dept Name" is in the 4th column
+                    if (department) {
+                        departmentCounts[department] = (departmentCounts[department] || 0) + 1;
+                    }
+                });
+
+            const barData = [['Department', 'Member Count']];
+            Object.entries(departmentCounts).forEach(([department, count]) => {
+                barData.push([department, count]);
+            });
+
+            const googleBarData = google.visualization.arrayToDataTable(barData);
+
+            const barOptions = {
+                isStacked: true,
+                vAxis: {
+                    title: 'Number of Members',
+                    titleTextStyle: { color: 'white' },
+                    textStyle: { color: 'white' }
+                },
+                hAxis: {
+                    title: 'Department',
+                    titleTextStyle: { color: 'white' },
+                    textStyle: { color: 'white' },
+                    fontSize:1,
+                },
+                backgroundColor: { fill: 'transparent' },
+                legend: {
+                    position: 'top',
+                    alignment:'end',
+                    textStyle: { color: 'white' },
+                },
+                chartArea: {
+                    left: 55,               // Space between the left edge and the chart
+                    right: 40,              // Space between the right edge and the chart
+                    top: 50,                // Space between the top edge and the chart
+                    bottom: 150              // Space between the bottom edge and the chart
+                },
+                subtitleTextStyle: {
+                    color: 'white',
+                    fontSize: 16
+                },
+                 
+            };
+
+
+            const barChart = new google.visualization.ColumnChart(document.getElementById('Totalbar_chart'));
+            barChart.draw(googleBarData, barOptions);
         }
-    });
 
-    // Prepare data for the stacked bar chart
-    const barData = [['Department', 'Member Count']];
-    Object.entries(departmentCounts).forEach(([department, count]) => {
-        barData.push([department, count]);
-    });
+        // Function to update the attendance stats (Total, Present, Absent)
+        function updateAttendanceStats(data) {
 
-    // Convert data into a format Google Charts understands
-    const googleBarData = google.visualization.arrayToDataTable(barData);
+            const attendanceCount = { p: 0, a: 0 };
 
-    // Set options for the stacked column chart (which is vertically stacked)
-    const barOptions = {
-        title: 'Number of Members per Department',
-        isStacked: true,  // Enables stacked bars
-        vAxis: { title: 'Number of Members' }, // Vertical axis now represents 'Number of Members'
-        hAxis: { title: 'Department' },        // Horizontal axis now represents 'Department'
-        colors: ['#1b9e77'],  // Can add more colors for multiple stacks if needed
-        chartArea: { width: '80%' }, // Optional: Adjust legend position if you have multiple categories
-        backgroundColor: { fill: 'transparent' },
-        titleTextStyle: {
-                position:'center',
-                color: '#EAEAEA', // Set title text color to dirty white
-                fontSize: 20, // Set title font size
-                fontWeight: 'bold', // Set title font weight to bold
-                fontName: 'Arial' // Set title font family (optional)
-        },
-        legend: {
-                position: 'bottom',
-                textStyle: {
-                    color: '#EAEAEA', // Set legend text color to dirty white
-                    fontSize: 14, // Set legend font size
-                    fontWeight: 'bold', // Set legend font weight to bold
-                    fontName: 'Arial' // Set legend font family (optional)
+            data.forEach(row => {
+                const status = row[10];  // Assuming the "Attendance Status" is in the 5th column
+            
+                if (status === 'p') {
+                    attendanceCount.p++;
+                } else if (status === 'a') {
+                    attendanceCount.a++;
                 }
-            },
-    };
+            });
 
-    // Create and draw the stacked column chart
-    const barChart = new google.visualization.ColumnChart(document.getElementById('bar_chart'));
-    barChart.draw(googleBarData, barOptions);
-}
+            const totalCount = attendanceCount.p + attendanceCount.a;
+            const attendancePercentage = {
+                p: totalCount ? (attendanceCount.p / totalCount * 100).toFixed(2) : 0,
+                a: totalCount ? (attendanceCount.a / totalCount * 100).toFixed(2) : 0
+            };
 
+            document.getElementById("totalStaff").textContent = `${totalCount}`;
+            document.getElementById("presentStaff").textContent = `${attendancePercentage.p}%`;
+            document.getElementById("absentStaff").textContent = `${attendancePercentage.a}%`;
+        }
 
+    
+        function generateStatusBarChart(data){
+            const departmentCounts = {};
+            const attendanceCount = { p: 0, a: 0 };
 
+            data.forEach((row,index) => {
+                if (index === 0) return;
+
+                const department = row[6];
+                const status = row[10];  // Assuming the "Attendance Status" is in the 5th column
+            
+                if (!departmentCounts[department]) {
+                    departmentCounts[department] = { p: 0, a: 0 };
+                }
+                if (status === 'p') {
+                    departmentCounts[department].p++;  // Increment the 'present' count for the department
+                } else if (status === 'a') {
+                    departmentCounts[department].a++;  // Increment the 'absent' count for the department
+                }
+            });
+                // console.log(departmentCounts)
+                const barData = [['Department', 'Present', {role: 'annotation' }, 'Absent',  { role: 'annotation' }]]; // Added columns for annotations
+    Object.entries(departmentCounts).forEach(([department, count]) => {
+        barData.push([department, count.p,count.p.toString(), count.a,  count.a.toString()]); // Include annotations for Present and Absent
+    });
+
+            const googleBarData = google.visualization.arrayToDataTable(barData);
+            var options = {
+                width: 1000,
+                chart: {
+                    title: 'Attendance Count',
+                    titleTextStyle: {
+                        fontSize: 24,
+                        bold: true,
+                        alignment: 'center',
+                        color:'white'
+                    }
+                },
+                backgroundColor: { fill: 'transparent' },
+                legend: {
+                    position: 'top',
+                    alignment:'end',
+                    textStyle: { color: 'white' }
+                },
+                chartArea: {
+                    left: 150,
+                    right: 55,
+                    top: 50,
+                    bottom: 50
+                },
+                hAxis: {
+                    title: 'Employee Status',
+                    titleTextStyle: {
+                        fontSize: 18,
+                        bold: true,
+                        color: 'white'
+                    },
+                    textStyle: {
+                        fontSize: 14,
+                        color: 'white'
+                    }
+                },
+                vAxis: {
+                    title: 'Department',
+                    titleTextStyle: {
+                        fontSize: 18,
+                        bold: true,
+                        color: 'white'
+                    },
+                    textStyle: {
+                        
+                        fontSize: 15,
+                        color: 'white'
+                    },
+                },
+                annotations: {
+                    style: 'point',  
+                    textStyle: {
+                        fontSize: 14,    
+                        color: 'white', 
+                        bold: true      
+                    },
+                    alwaysOutside: true, 
+                    textPosition:'end',
+                  
+                }
+
+            };
+            const Presentchart = new google.visualization.BarChart(document.getElementById('PresentBar_chart'));
+            Presentchart.draw(googleBarData, options);
+            console.log(options)
+        };
+    
+      
     </script>
 </body>
 </html>
