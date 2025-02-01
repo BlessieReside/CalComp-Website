@@ -39,7 +39,7 @@ body {
     color: #fff;
 }
  
-p{
+h1{
     width: 1100px;
     display: block;
     padding: 10px;
@@ -55,7 +55,7 @@ p{
 /* sidebar */
 #dashboardDropdown, #toolingDropdown{
     display: none;
-    background-color: #f7ffff;
+    background-color: #444444;
 }
 #dashboardDropdown li a, #toolingDropdown li a {
     /* Your styles here */
@@ -440,11 +440,9 @@ article{
     /* gap: 10%; */
     margin-top: 20px;
     width: 100%;
-    height: 100vh;
+    height: 300vh;
     /* background-color:blue; */
 }
-
-
 .shift-card {
     background-color: #333;
     padding: 20px;
@@ -462,13 +460,16 @@ article{
 
   .donut-chart {
     width: 150px;
-    height: 150px;
+    height: 120px;
     position: relative;
+
   }
 
   .donut-chart svg {
     width: 50%;
-    height: 100%;
+    height: 150%;
+    background-color: #eee8e8;
+ 
   }
 
   .donut-chart .center {
@@ -487,31 +488,91 @@ article{
     font-size: 24px;
     font-weight: bold;
   }
-#bar_chart{
+#Totalbar_chart{
     width: 160vh;
     height: 100vh;
-    margin-top: 40px;
     background-color: transparent; 
+    /* color: white; */
     
 }
 #donut_chart{
+    /* background-color: transparent;  */
+    /* background-color: yellowgreen; */
+    
+    align-self: center;
+    align-items: center;
+    text-align: center;
+
+}
+#PresentBar_chart{
+    width: 160vh;
+    height: 200vh;
     background-color: transparent; 
+    /* color: white; */
+    
 }
 /* Style the chart title */
+#PresentBar_chart .google-visualization-title {
+    font-size: 24px;         /* Font size */
+    color: #f3f0f0;          /* Text color */
+    font-weight: bold;       /* Bold font */
+    text-align: justify;      /* Center the title */
+    margin-bottom: 20px;     /* Space below the title */
+
+}
 #bar_chart .google-visualization-title {
     font-size: 24px;         /* Font size */
     color: #f3f0f0;          /* Text color */
     font-weight: bold;       /* Bold font */
     text-align: justify;      /* Center the title */
     margin-bottom: 20px;     /* Space below the title */
+
 }
-#donut_chart .google-visualization{
+#donut_chart .google-visualization-title{
     font-size: 24px;         /* Font size */
     color: #eee8e8;          /* Text color */
     font-weight: bold;       /* Bold font */
     text-align: center;      /* Center the title */
-    margin-bottom: 20px;     /* Space below the title */
+    /* margin-bottom: 20px;     Space below the title */
     background-color: transparent; 
 }
+h4{
+    color:whitesmoke;
+    /* font-size: 50px; */
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 5px;
+    margin-top: 30px;
+}
 
-
+.main{
+    display: flex;
+    padding:10px 10px;
+    align-items: center;
+    gap: 1%;
+    flex-shrink: 1;
+    margin-top: 20px;
+    width: 1110px;
+    height: 11vh;
+    /* background-color:yellow; */
+}
+ .main .card {
+    color: rgb(236, 240, 240);
+    background-color: #444;
+    padding: 10px;
+    width: 320px;
+}
+.main .card h4 {
+    margin: 0;
+    /* padding-left: 30px; */
+    text-align: left;
+    align-items: center;
+}
+.main .card p{
+    font-size: 50px;
+    text-align: center;
+    font-weight: bold;
+    align-self: center;
+    align-items: center;
+    margin: 0;
+}
